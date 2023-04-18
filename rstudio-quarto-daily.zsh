@@ -38,11 +38,15 @@ echo "Beginning RStudio installation"
 echo "  - Retrieving macOS RStudio (electron) daily metadata"
 curl --silent https://dailies.rstudio.com/rstudio/mountain-hydrangea/index.json -o /tmp/index.json
 
+# fix the json
+json_content=$(cat /tmp/index.json)
+fixed_json="${json_content//<no value>/null}"
+
 
 # Get the DMG URL and name
-DMG=$(cat /tmp/index.json | $JQ_BIN -r .electron.platforms.macos.link)
-FIL=$(cat /tmp/index.json | $JQ_BIN -r .electron.platforms.macos.filename)
-VER=$(cat /tmp/index.json | $JQ_BIN -r .electron.platforms.macos.version)
+DMG=$(echo "$fixed_json" | $JQ_BIN -r .electron.platforms.macos.link)
+FIL=$(echo "$fixed_json" | $JQ_BIN -r .electron.platforms.macos.filename)
+VER=$(echo "$fixed_json" | $JQ_BIN -r .electron.platforms.macos.version)
 
 if [[ -f "${HOME}/Downloads/${FIL}" ]] ; then # Already have it
   echo "  - Found DMG in Downloads folder"
